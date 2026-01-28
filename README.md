@@ -1,5 +1,6 @@
 # 🌍 Linux Deprem Bildirici
-
+![Logo](logo.png)
+---
 **Linux Deprem Bildirici**, Kandilli Rasathanesi (KOERI) verilerini kullanarak belirlediğiniz şehir ve büyüklük filtresine göre **gerçek zamanlı deprem uyarıları** veren, sistem tepsisinde (tray) çalışan bir Linux uygulamasıdır.
 
 Deprem algılandığında:  
