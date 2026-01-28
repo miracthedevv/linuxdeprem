@@ -1,0 +1,7 @@
+pygame
+requests
+gTTS
+pystray
+Pillow
+PyQt6
+

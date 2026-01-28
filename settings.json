@@ -1,0 +1,7 @@
+{
+    "tts": true,
+    "siren_volume": 100,
+    "uyari_screen": "U1_uyari.png",
+    "city_filter": "TRABZON",
+    "mw_threshold": 3
+}
