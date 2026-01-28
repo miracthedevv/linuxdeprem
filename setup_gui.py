@@ -1,133 +1,76 @@
-import sys
 import os
+import sys
 import subprocess
-import shutil
-from PyQt6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QLabel,
-    QPushButton, QProgressBar, QMessageBox
-)
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QVBoxLayout, QFileDialog, QMessageBox
 
-# =========================
-# SABİTLER
-# =========================
-APP_NAME = "Linux Deprem Bildirici Kurulumu"
+APP_NAME = "Linux Deprem Bildirici"
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+AUTOSTART_DIR = os.path.expanduser("~/.config/autostart")
+DESKTOP_FILE = os.path.join(AUTOSTART_DIR, "LinuxDepremBildirici.desktop")
 
-INSTALL_DIR = os.path.expanduser("~/.local/share/linux-deprem-bildirici")
-SERVICE_DIR = os.path.expanduser("~/.config/systemd/user")
-SERVICE_FILE = os.path.join(SERVICE_DIR, "linux-deprem-bildirici.service")
-
-FILES = [
-    "depremuyarisys.py",
-    "trayservice.py",
-    "settings.json",
-    "siren.mp3",
-    "logo.png",
-    "U1_uyari.png",
-    "U2_uyari.png",
-    "U3_uyari.png",
+REQUIRED_PACKAGES = [
+    "pygame",
+    "pystray",
+    "PyQt6",
+    "gTTS",
+    "requests"
 ]
 
-# =========================
-# SETUP GUI
-# =========================
+# -----------------------
+# Python paketlerini kur
+# -----------------------
+def install_packages():
+    for pkg in REQUIRED_PACKAGES:
+        subprocess.run([sys.executable, "-m", "pip", "install", "--break-system-packages", pkg])
+
+# -----------------------
+# Autostart .desktop dosyası
+# -----------------------
+def create_autostart():
+    os.makedirs(AUTOSTART_DIR, exist_ok=True)
+    exec_path = os.path.join(APP_DIR, "trayservice.py")
+    content = f"""[Desktop Entry]
+Type=Application
+Name=Linux Deprem Bildirici
+Exec={sys.executable} {exec_path}
+X-GNOME-Autostart-enabled=true
+"""
+    with open(DESKTOP_FILE, "w") as f:
+        f.write(content)
+
+# -----------------------
+# Basit GUI
+# -----------------------
 class SetupWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(APP_NAME + " - Kurulum")
-        self.setFixedSize(460, 280)
+        self.setWindowTitle(f"{APP_NAME} Kurulum")
+        self.setFixedSize(400, 250)
+
+        label = QLabel("Linux Deprem Bildirici kurulumu yapılacak.\n\nOtomatik başlatma ve bağımlılıklar kurulacak.")
+        label.setWordWrap(True)
+        btn_install = QPushButton("Kurulumu Başlat")
+        btn_install.clicked.connect(self.run_setup)
 
         layout = QVBoxLayout()
-
-        self.label = QLabel(
-            "<h3>Linux Deprem Bildirici</h3>"
-            "<p>Bu sihirbaz programı sistemine kurar ve<br>"
-            "bilgisayar açılışında otomatik başlatır.</p>"
-        )
-        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(self.label)
-
-        self.progress = QProgressBar()
-        self.progress.setValue(0)
-        layout.addWidget(self.progress)
-
-        self.button = QPushButton("Kurulumu Başlat")
-        self.button.clicked.connect(self.install)
-        layout.addWidget(self.button)
-
+        layout.addWidget(label)
+        layout.addWidget(btn_install)
         self.setLayout(layout)
 
-    # =========================
-    # KURULUM
-    # =========================
-    def install(self):
+    def run_setup(self):
         try:
-            self.button.setEnabled(False)
-
-            # 1️⃣ Python paketleri
-            self.progress.setValue(10)
-            subprocess.check_call([
-                sys.executable, "-m", "pip", "install",
-                "--user",
-                "--break-system-packages",
-                "-r", "requirements.txt"
-            ])
-
-            # 2️⃣ Dosyaları kopyala
-            self.progress.setValue(40)
-            os.makedirs(INSTALL_DIR, exist_ok=True)
-            for f in FILES:
-                shutil.copy(f, INSTALL_DIR)
-
-            # 3️⃣ systemd user service
-            self.progress.setValue(70)
-            os.makedirs(SERVICE_DIR, exist_ok=True)
-
-            service_text = f"""[Unit]
-Description=Linux Deprem Bildirici
-After=network.target
-
-[Service]
-ExecStart=/usr/bin/python3 {INSTALL_DIR}/trayservice.py
-Restart=always
-
-[Install]
-WantedBy=default.target
-"""
-
-            with open(SERVICE_FILE, "w") as f:
-                f.write(service_text)
-
-            subprocess.call(["systemctl", "--user", "daemon-reload"])
-            subprocess.call(["systemctl", "--user", "enable", "linux-deprem-bildirici"])
-            subprocess.call(["systemctl", "--user", "start", "linux-deprem-bildirici"])
-
-            # 4️⃣ KURULUM BİTER BİTMEZ ÇALIŞTIR
-            subprocess.Popen(
-                ["/usr/bin/python3", f"{INSTALL_DIR}/trayservice.py"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
-
-            self.progress.setValue(100)
-
-            QMessageBox.information(
-                self,
-                "Kurulum Tamamlandı",
-                "Linux Deprem Bildirici başarıyla kuruldu ve çalıştırıldı.\n\n"
-                "Sistem tepsisinde (sağ altta) aktif."
-            )
+            install_packages()
+            create_autostart()
+            QMessageBox.information(self, "Tamamlandı", "Kurulum tamamlandı!\nBilgisayar açıldığında uygulama otomatik başlayacak.")
             self.close()
-
         except Exception as e:
-            QMessageBox.critical(self, "Kurulum Hatası", str(e))
-            self.button.setEnabled(True)
+            QMessageBox.critical(self, "Hata", f"Kurulum sırasında hata oluştu:\n{e}")
 
-# =========================
-# MAIN
-# =========================
+# -----------------------
+# Main
+# -----------------------
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    win = SetupWindow()
-    win.show()
+    window = SetupWindow()
+    window.show()
     sys.exit(app.exec())
