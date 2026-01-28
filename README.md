@@ -28,12 +28,10 @@ Uygulama **Ubuntu / Debian tabanlı** sistemlerle uyumludur.
 ---
 
 ## 🖥️ Ekran Görüntüleri
-
-> (Buraya ekran görüntüleri ekleyebilirsiniz)  
-
-- Tam ekran uyarı ekranı  
-- Tray menüsü  
-- Ayarlar penceresi  
+Ekrana uyarının nasıl geldiğini ![buradan](https://www.youtube.com/watch?v=WleXvYA77Dk) seyredebilirsiniz.
+![Tray 1](ekrangrnt/trayshow.png)
+![Tray 2](ekrangrnt/trayfull.png)
+![Ayarlar menüsü](ekrangrnt/settings.png)
 
 ---
 
@@ -41,8 +39,8 @@ Uygulama **Ubuntu / Debian tabanlı** sistemlerle uyumludur.
 
 ### Gereksinimler
 
-- Python 3.9 veya üzeri  
-- Linux (Mint / Ubuntu / Debian)  
+- Python 3.10 veya üzeri  
+- Linux (Ubuntu / Debian)  
 - İnternet bağlantısı  
 
 ### Kurulum Adımları
