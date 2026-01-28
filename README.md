@@ -30,7 +30,7 @@ Uygulama **Ubuntu / Debian tabanlı** sistemlerle uyumludur.
 ## 🖥️ Ekran Görüntüleri
 Ekrana uyarının nasıl geldiğini ![buradan](https://www.youtube.com/watch?v=WleXvYA77Dk) seyredebilirsiniz.
 ![Tray 1](ekrangrnt/trayshow.png)
-![Tray 2](ekrangrnt/trayfull.png)
+![Tray 2](ekrangrnt/trayfull.jpg)
 ![Ayarlar menüsü](ekrangrnt/settings.png)
 
 ---
